@@ -4,6 +4,9 @@ node_modules
 /dist
 /public/build
 /.mf
+/.hydrogen
+/.react-router
+
 .env
 .env.sanity
 .shopify
