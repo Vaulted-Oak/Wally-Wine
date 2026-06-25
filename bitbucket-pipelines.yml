@@ -1,0 +1,18 @@
+image: node:20
+
+pipelines:
+  branches:
+    main:
+      - step:
+          name: Install dependencies and build project
+          script:
+            - npm ci
+            - npm install -g @shopify/cli
+            - npm run build
+      - step:
+          name: Deploy to production
+          deployment: production
+          script:
+            - npm ci
+            - npm install -g @shopify/cli
+            - shopify hydrogen deploy --token $SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN

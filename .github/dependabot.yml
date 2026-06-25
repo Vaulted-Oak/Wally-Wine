@@ -1,0 +1,57 @@
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      day: 'monday'
+      interval: 'weekly'
+      time: '05:30'
+      timezone: 'America/New_York'
+    reviewers:
+      - 'frontvibe/maintainers'
+    groups:
+      patch-minor:
+        applies-to: version-updates
+        update-types:
+          - 'minor'
+          - 'patch'
+      remix:
+        patterns:
+          - '@remix-run/*'
+        applies-to: version-updates
+        update-types:
+          - 'major'
+      sanity:
+        patterns:
+          - '@sanity/*'
+        applies-to: version-updates
+        update-types:
+          - 'major'
+    ignore:
+      - dependency-name: '@shopify/oxygen-workers-types'
+        update-types:
+          ['version-update:semver-minor', 'version-update:semver-major']
+      - dependency-name: '@shopify/cli'
+        update-types:
+          ['version-update:semver-minor', 'version-update:semver-major']
+
+  - package-ecosystem: 'npm'
+    directory: '/studio'
+    schedule:
+      interval: 'weekly'
+      time: '05:30'
+      timezone: 'America/New_York'
+    groups:
+      patch-minor:
+        applies-to: version-updates
+        update-types:
+          - 'minor'
+          - 'patch'
+      sanity:
+        patterns:
+          - 'sanity'
+          - 'groq'
+          - '@sanity/*'
+        applies-to: version-updates
+        update-types:
+          - 'major'

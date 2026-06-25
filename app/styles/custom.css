@@ -1,0 +1,62 @@
+/*
+  Based on TailwindCSS recommendations,
+  consider using classes instead of the `@apply` directive
+  @see https://tailwindcss.com/docs/reusing-styles#avoiding-premature-abstraction
+*/
+.mainBannerContent svg {
+  @apply mx-auto my-0 w-[300px] md:w-auto h-auto
+}
+.mainBannerContent a {
+  @apply text-[40px] uppercase text-white;
+}
+.slider-arrow {
+  @apply md:w-14 md:h-14 h-[44px] w-[44px] md:absolute z-[1] md:top-[45%] notouch:hover:!bg-accent/55 rounded-full;
+  background: url("./images/slider-arrow.svg") no-repeat center;
+  background-size: contain;
+}
+.popularCategories > button {
+  @apply hidden md:block;
+}
+.next-arrow {
+  @apply md:right-5;
+}
+.prev-arrow {
+  @apply rotate-180 md:left-5;
+  -webkit-transform: rotate(180deg);
+}
+.popularCategories {
+  @apply md:py-[50px] py-[20px];
+}
+.popularCategories .aspect-video {
+  @apply aspect-[inherit];
+}
+.popularCategories img {
+  @apply mx-auto my-0;
+}
+.inStock {
+  background: url("./images/stock.svg") no-repeat left;
+}
+.isOpen h3:after {
+  @apply hidden;
+}
+.blog-content h2,
+.blog-content h3{
+  font-size: 24px;
+  margin: 10px 0;
+}
+.blog-content p{
+  line-height: 22px;
+  margin-bottom: 10px;
+}
+
+#gorgias-chat-container .gorgias-chat-key-1vly0ou {
+z-index: 1 !important;
+}
+
+
+@media (max-width: 768px) {
+ .homebanner {
+    align-items: flex-start !important;
+    height: auto !important;
+} 
+}

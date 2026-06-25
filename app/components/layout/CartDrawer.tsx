@@ -1,0 +1,149 @@
+import type {CartApiQueryFragment} from 'storefrontapi.generated';
+
+import {Await, Link} from 'react-router';
+import {CartForm} from '@shopify/hydrogen';
+import {cx} from 'class-variance-authority';
+import {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
+
+import {useCartFetchers} from '~/hooks/useCartFetchers';
+import {useIsHydrated} from '~/hooks/useIsHydrated';
+import {useLocalePath} from '~/hooks/useLocalePath';
+import {useSanityThemeContent} from '~/hooks/useSanityThemeContent';
+import {cn} from '~/lib/utils';
+import {useRootLoaderData} from '~/root';
+
+import {useDevice} from '../../hooks/useDevice';
+import {Cart} from '../cart/Cart';
+import {IconBag} from '../icons/IconBag';
+import {iconButtonClass} from '../ui/Button';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '../ui/Drawer';
+
+export function CartDrawer({isMatchingPage}: {isMatchingPage?: boolean}) {
+  const rootData = useRootLoaderData();
+  return (
+    <Suspense fallback={<Badge count={0} />}>
+      <Await resolve={rootData?.cart}>
+        {(cart) => (
+          <Badge
+            cart={cart as CartApiQueryFragment}
+            count={cart?.totalQuantity || 0}
+            isMatchingPage={isMatchingPage}
+          />
+        )}
+      </Await>
+    </Suspense>
+  );
+}
+
+function Badge(props: {cart?: CartApiQueryFragment;isMatchingPage?:boolean; count: number}) {
+  const {count,isMatchingPage} = props;
+  const isHydrated = useIsHydrated();
+  const path = useLocalePath({path: '/cart'});
+  const {themeContent} = useSanityThemeContent();
+  const [cartOpen, setCartOpen] = useState(false);
+  const addToCartFetchers = useCartFetchers(CartForm.ACTIONS.LinesAdd);
+  const device = useDevice();
+  const cartIsLoading = Boolean(addToCartFetchers.length);
+  /**
+   * Whether the user has manually closed the cart drawer,
+   * so we avoid opening it again when addToCartFetchers updates
+   */
+  const [userClosedCart, setUserClosedCart] = useState(false);
+
+  const handleOpen = useCallback(() => {
+    if (!cartOpen && addToCartFetchers.length && !userClosedCart) {
+      setCartOpen(true);
+    }
+  }, [addToCartFetchers, cartOpen, userClosedCart]);
+
+  const onOpenChange = useCallback((open: boolean) => {
+    setCartOpen(open);
+    if (!open) {
+      setUserClosedCart(true);
+    }
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setCartOpen(false);
+    setUserClosedCart(true);
+  }, []);
+
+  // Reset userClosedCart when fetchers are done
+  useEffect(() => {
+    if (addToCartFetchers.length === 0) {
+      setUserClosedCart(false);
+    }
+  }, [addToCartFetchers]);
+
+  // Toggle cart drawer when adding to cart
+  useEffect(() => {
+    handleOpen();
+  }, [addToCartFetchers, handleOpen]);
+
+  const BadgeCounter = useMemo(
+    () => (
+      <span className="relative">
+        <span className="sr-only">{themeContent?.cart?.heading}</span>
+        <IconBag className="size-6" />
+        {count > 0 && (
+          <div
+            className={cx([
+              'absolute text-primaryBlack bg-white min-w-[15px] absolute max-w-[15px] font-[normal] mx-auto my-0 p-0 rounded-none top-[13px] inset-x-0 flex items-center justify-center',
+              'bg-foreground text-background transition-colors',
+              'group-active:bg-accent-foreground group-active:text-accent',
+              'notouch:group-hover:bg-white notouch:group-hover:text-primaryBlack',
+              'aspect-square h-auto min-w-[1.35rem] rounded-full p-1',
+              'text-center text-[.7rem] leading-[0] subpixel-antialiased',
+            ])}
+          >
+            <span>{count}</span>
+          </div>
+        )}
+      </span>
+    ),
+    [count, themeContent?.cart?.heading],
+  );
+
+  const buttonClass = cn(iconButtonClass, 'group notouch:hover:bg-transparent');
+
+  return isHydrated ? (
+    <Drawer
+      direction={device === 'desktop' ? 'right' : 'bottom'}
+      onOpenChange={onOpenChange}
+      open={cartOpen}
+    >
+      <DrawerTrigger className={buttonClass}>{!isMatchingPage && BadgeCounter}</DrawerTrigger>
+      <DrawerContent
+        className="cart flex h-[97.5svh] max-h-screen w-screen flex-col gap-0 bg-background p-0 text-foreground lg:left-auto lg:right-0 lg:h-svh lg:max-w-lg"
+        onCloseAutoFocus={(e) => e.preventDefault()}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <DrawerHeader className="px-6 py-5 shadow-sm shadow-foreground/10">
+          <DrawerTitle className="flex items-center gap-4 font-normal text-[24px] tracking-[2px] uppercase">
+            <span>Your Cart</span>
+          </DrawerTitle>
+        </DrawerHeader>
+        <DrawerDescription className="sr-only">
+          {themeContent?.cart?.heading}
+        </DrawerDescription>
+        <Cart
+          cart={props.cart}
+          layout="drawer"
+          loading={cartIsLoading}
+          onClose={handleClose}
+        />
+      </DrawerContent>
+    </Drawer>
+  ) : (
+    <Link className={buttonClass} prefetch="intent" to={path}>
+      {BadgeCounter}
+    </Link>
+  );
+}

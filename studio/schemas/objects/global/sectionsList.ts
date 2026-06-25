@@ -1,0 +1,126 @@
+import { defineField, InsertMenuOptions } from 'sanity';
+
+const globalSections = [
+  {
+    type: 'imageBannerSection',
+  },
+  {
+    type: 'imageBannerArraySection'
+  },
+  {
+    type: 'bannerCollectionSection'
+  },
+  {
+    type: 'locationImagesSection'
+  },
+  {
+    type: 'videoSection'
+  },
+  {
+    type: 'instagramSection'
+  },
+  {
+    type: 'whatWeOffer'
+  },
+  {
+    type: 'columnSection'
+  },
+  {
+    type: 'multiImageCarouselCollectionSection'
+  },
+  {
+    type: 'restaurantCollectionSection'
+  },
+  {
+    type: 'restaurantSection'
+  },
+  {
+    type: 'eventSection'
+  },
+  {
+    type: 'eventCollectionSection'
+  },
+  {
+    type: 'footerSection',
+  },
+  {
+    type: 'featuredCollectionSection',
+  },
+  {
+    type: 'featuredProductSection',
+  },
+  {
+    type: 'collectionListSection',
+  },
+  {
+    type: 'carouselSection',
+  },
+  {
+    type: 'richtextSection',
+  },
+];
+
+const pdpSections = [
+  {
+    type: 'productInformationSection',
+  },
+  {
+    type: 'relatedProductsSection',
+  },
+  ...globalSections,
+];
+
+const collectionSectionsList = [
+  {
+    type: 'collectionBannerSection',
+  },
+  {
+    type: 'collectionProductGridSection',
+  },
+  ...globalSections,
+];
+
+export const sectionOptionInsertMenu: { insertMenu: InsertMenuOptions } = {
+  insertMenu: {
+    views: [
+      {
+        name: 'grid',
+        previewImageUrl: (schemaTypeName) =>
+          `/static/assets/${schemaTypeName}.jpg`,
+      },
+    ],
+  },
+};
+
+export default defineField({
+  title: 'Sections',
+  name: 'sections',
+  type: 'array',
+  group: 'pagebuilder',
+  of: globalSections,
+  options: {
+    ...sectionOptionInsertMenu,
+  },
+});
+
+export const productSections = defineField({
+  title: 'Sections',
+  name: 'productSections',
+  type: 'array',
+  group: 'pagebuilder',
+  of: pdpSections,
+  options: {
+    ...sectionOptionInsertMenu,
+  },
+});
+
+export const collectionSections = defineField({
+  title: 'Sections',
+  name: 'collectionSections',
+  type: 'array',
+  group: 'pagebuilder',
+  of: collectionSectionsList,
+  options: {
+    ...sectionOptionInsertMenu,
+  },
+});
